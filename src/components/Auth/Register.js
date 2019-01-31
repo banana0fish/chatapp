@@ -2,6 +2,7 @@ import React from 'react'
 import { Grid, Form, Segment, Button, Header, Message, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import firebase from '../../firebase'
+import md5 from 'md5'
 
 class Register extends React.Component {
   constructor(props) {
@@ -34,7 +35,7 @@ class Register extends React.Component {
       this.setState({ errors: errors.concat(error) })
       return false
     }else if (!this.isPasswordValid(this.state)) {
-      error = { message: "Password is invalid"}
+      error = { message: "Password is not valid"}
       this.setState({ errors: errors.concat(error) })
       return false
     }else {
@@ -61,20 +62,34 @@ class Register extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault()
-    this.setState({ errors: [], loading: true })
     if (this.isFormValid()) {
+      this.setState({ errors: [], loading: true })
     firebase
       .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(createdUser => {
         console.log(createdUser)
-        this.setState({ loading: false})
+        createdUser.user.updateProfile({
+          displayName: this.state.username,
+          photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}d=identicon`
+        })
+        .then(() => {
+          this.setState({ loading: false})
+        })
+        .catch(err => {
+          console.error(err)
+          this.setState({ errors: this.state.errors.concat(err), loading: false})
+        })
       })
       .catch(err => {
         console.log(err)
         this.setState({ errors: this.state.errors.concat(err), loading: false})
       })
     }
+  }
+
+  handleInputError = (errors, inputName) => {
+    errors.some(error => error.message.toLowerCase().includes(inputName)) ? 'error' : ""
   }
 
   render () {
@@ -107,6 +122,7 @@ class Register extends React.Component {
                 placeholder="Email Address"
                 onChange={this.handleChange}
                 value={email}
+                className={this.handleInputError(errors, "email")}
                 type="email"
               />
 
@@ -118,6 +134,7 @@ class Register extends React.Component {
                 placeholder="Password"
                 onChange={this.handleChange}
                 value={password}
+                className={this.handleInputError(errors, "password")}
                 type="password"
               />
 
@@ -128,6 +145,7 @@ class Register extends React.Component {
                 placeholder="Password Confirmation"
                 onChange={this.handleChange}
                 value={passwordConfirmation}
+                className={this.handleInputError(errors, "password")}
                 type="password"
               />
 

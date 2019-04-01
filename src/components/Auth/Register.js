@@ -13,7 +13,8 @@ class Register extends React.Component {
       password: '',
       passwordConfirmation: '',
       errors: [],
-      loading: false
+      loading: false,
+      usersRef: firebase.database().ref('users')
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -74,7 +75,9 @@ class Register extends React.Component {
           photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}d=identicon`
         })
         .then(() => {
-          this.setState({ loading: false})
+          this.saveUser(createdUser).then(() => {
+            console.log("user saved")
+          })
         })
         .catch(err => {
           console.error(err)
@@ -92,12 +95,19 @@ class Register extends React.Component {
     errors.some(error => error.message.toLowerCase().includes(inputName)) ? 'error' : ""
   }
 
+  saveUser = createdUser => {
+    return this.state.usersRef.child(createdUser.user.uid).set({
+      name: createdUser.user.displayName,
+      avatar: createdUser.user.photoURL
+    })
+  }
+
   render () {
     const { username, email, password, passwordConfirmation, errors, loading} = this.state
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <Grid.Column style={{ maxWidth: 450 }}>
-          <Header as="h2" icon color="orange" textAlign="center">
+          <Header as="h1" icon color="orange" textAlign="center">
             <Icon name="puzzle piece" color="orange"/>
             Register for chatapp
           </Header>

@@ -61,6 +61,10 @@ class MessageForm extends React.Component {
     }
   }
 
+  uploadFile = (file, metadata) => {
+    console.log(file, metadata)
+  }
+
   render() {
     const { errors, message, loading, modal } = this.state
 
@@ -96,6 +100,7 @@ class MessageForm extends React.Component {
             icon="cloud upload"
           />
           <FileModal
+          uploadFile={this.uploadFile}
             modal={modal}
             closeModal={this.closeModal}
           />

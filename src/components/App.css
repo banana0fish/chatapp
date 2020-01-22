@@ -15,6 +15,11 @@ body,
 
 }
 
+.messages__progress {
+  height: 58vh;
+  overflow-y: scroll;
+}
+
 /* messagesForm */
 
 .message__form {

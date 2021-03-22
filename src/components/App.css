@@ -2,10 +2,13 @@ html,
 body,
 .app {
   height: 100vh;
-  background: #eee;
+  background: rgba(102, 133, 122, 0.938);
   padding: 1em;
 }
-
+/* SidePanel */
+.menu {
+  padding-bottom: 2em;
+}
 
 /* messages */
 
